@@ -23,9 +23,13 @@ export default {
             type: Object, required: true
         }
     },
-    methods: {
-        favoriteTwoot(id) {
+    setup () {
+        function favoriteTwoot(id) {
             this.$emit('addFavoriteEvent', id)
+        }
+
+        return {
+            favoriteTwoot
         }
     }
 }

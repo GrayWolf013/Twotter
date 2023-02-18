@@ -9,21 +9,7 @@
                 <strong>followers: </strong>{{ followers }}
             </div>
 
-            <form class="user-profile__create-twoot" @submit.prevent="createNewTwoot"
-                :class="{ '--exeeded': NewTwootCharacterCount > 180 }">
-                <label for="newTwoot"><strong>New Twoot</strong> {{ NewTwootCharacterCount }}/180</label>
-                <textarea id="newTwoot" v-model="newTwoot.content" rows="4"></textarea>
-                <div class="user-profile__create-twoot-type">
-                    <label for="newTwootType"><strong>Type: </strong></label>
-                    <select id="newTwootType" v-model="newTwoot.type">
-                        <option :value="option.value" v-for="(option, index) in twootTypes" :key="index">
-                            {{ option.name }}
-                        </option>
-                    </select>
-                </div>
-                <button>Twoot !!</button>
-            </form>
-
+            <CreateTwootPannel @add-twoot="addTwoot" />
         </div>
         <div class="user-profile__twoots-wrapper">
             <TwotterItem v-for="twoot in user.twoots" :key="twoot.id" :username="user.username" :twoot="twoot"
@@ -34,18 +20,14 @@
 
 <script>
 import TwotterItem from './TwotterItem.vue'
+import CreateTwootPannel from './CreateTwootPannel.vue'
+
+import { reactive, toRefs, onMounted } from 'vue'
 
 export default {
     name: 'UserProfile',
-    data() {
-        return {
-            newTwoot: {
-                content: "", type: "instant"
-            },
-            twootTypes: [
-                { value: "draft", name: "Draft" },
-                { value: "instant", name: "Instant Twoot" },
-            ],
+    setup() {
+        const state = reactive({
             followers: 0,
             user: {
                 id: 1,
@@ -60,7 +42,38 @@ export default {
                     { id: 3, content: "Fight Club is an amazing movie" },
                 ],
             },
+        })
+
+        function followUser() {
+            state.followers++
         }
+
+        function toggleFavorite(id) {
+            console.log(`favorite twoot with the id: #${id}`)
+        }
+
+        function addTwoot(twootContent) {
+            state.user.twoots.unshift({
+                id: state.user.twoots.length + 1,
+                content: twootContent
+            })
+        }
+
+        onMounted(() => {
+            followUser()
+        })
+
+        return {
+            ...toRefs(state),
+
+            followUser,
+            toggleFavorite,
+            addTwoot
+        }
+    },
+    components: {
+        TwotterItem,
+        CreateTwootPannel
     },
     watch: {
         followers(newFollowerCount, oldFollowerCount) {
@@ -69,39 +82,8 @@ export default {
             }
         }
     },
-    methods: {
-        followUser() {
-            this.followers++
-        },
-        toggleFavorite(id) {
-            console.log(`favorite twoot with the id: #${id}`)
-        },
-        createNewTwoot() {
-            if (this.newTwoot.content && this.newTwoot.type != "draft") {
-                this.user.twoots.unshift({
-                    id: this.user.twoots.length + 1,
-                    content: this.newTwoot.content
-                })
-                this.newTwoot.content = ""
-            } 
-        },
-    },
-    computed: {
-        fullName() {
-            return `${this.user.firstName} ${this.user.lastName}`;
-        },
-        NewTwootCharacterCount() {
-            return this.newTwoot.content.length
-        }
-
-    },
-    mounted() {
-        this.followUser()
-    },
-    components: {
-        TwotterItem
-    }
 }
+
 </script>
 
 
@@ -134,45 +116,6 @@ export default {
     .user-profile__twoots-wrapper {
         display: grid;
         grid-gap: 10px;
-    }
-
-    .user-profile__create-twoot {
-        padding-top: 20px;
-        display: flex;
-        flex-direction: column;
-
-        &.--exeeded {
-            color: red;
-            border-color: red;
-
-            button {
-                background-color: grey;
-                color: white;
-                border: none;
-            }
-        }
-
-
-        textarea {
-            margin-bottom: 10px;
-            width: 100%;
-            height: 150px;
-            padding: 12px 20px;
-            box-sizing: border-box;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            background-color: #f8f8f8;
-            resize: none;
-        }
-
-        select {
-            width: 100%;
-            padding: 20px;
-            border: none;
-            border-radius: 4px;
-            background-color: #f1f1f1;
-            margin-bottom: 20px;
-        }
     }
 }
 
