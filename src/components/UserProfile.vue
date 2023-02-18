@@ -8,8 +8,10 @@
             <div class="user-profile__follower-count">
                 <strong>followers: </strong>{{ followers }}
             </div>
-            <form class="user-profile__create-twoot" @submit.prevent="createNewTwoot">
-                <label for="newTwoot"><strong>New Twoot</strong></label>
+
+            <form class="user-profile__create-twoot" @submit.prevent="createNewTwoot"
+                :class="{ '--exeeded': NewTwootCharacterCount > 180 }">
+                <label for="newTwoot"><strong>New Twoot</strong> {{ NewTwootCharacterCount }}/180</label>
                 <textarea id="newTwoot" v-model="newTwoot.content" rows="4"></textarea>
                 <div class="user-profile__create-twoot-type">
                     <label for="newTwootType"><strong>Type: </strong></label>
@@ -21,6 +23,7 @@
                 </div>
                 <button>Twoot !!</button>
             </form>
+
         </div>
         <div class="user-profile__twoots-wrapper">
             <TwotterItem v-for="twoot in user.twoots" :key="twoot.id" :username="user.username" :twoot="twoot"
@@ -37,7 +40,7 @@ export default {
     data() {
         return {
             newTwoot: {
-                content: "", type: "instant" 
+                content: "", type: "instant"
             },
             twootTypes: [
                 { value: "draft", name: "Draft" },
@@ -80,13 +83,17 @@ export default {
                     content: this.newTwoot.content
                 })
                 this.newTwoot.content = ""
-            }
+            } 
         },
     },
     computed: {
         fullName() {
             return `${this.user.firstName} ${this.user.lastName}`;
+        },
+        NewTwootCharacterCount() {
+            return this.newTwoot.content.length
         }
+
     },
     mounted() {
         this.followUser()
@@ -98,42 +105,75 @@ export default {
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 .user-profile {
     display: grid;
     grid-template-columns: 1fr 3fr;
     width: 100%;
     padding: 58px 5%;
-}
 
-.user-profile__user-panel {
-    display: flex;
-    flex-direction: column;
-    margin-right: 50px;
-    padding: 20px;
-    background-color: white;
-    border-radius: 5px;
-    border: 1px solid #DFE3E8;
-}
+    .user-profile__user-panel {
+        display: flex;
+        flex-direction: column;
+        margin-right: 50px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 5px;
+        border: 1px solid #DFE3E8;
+    }
 
-.user-profile__admin-badge {
-    background-color: cornflowerblue;
-    color: whitesmoke;
-    border-radius: 5px;
-    margin-right: auto;
-    padding: 0 10px;
-    font-weight: bold;
-}
+    .user-profile__admin-badge {
+        background-color: cornflowerblue;
+        color: whitesmoke;
+        border-radius: 5px;
+        margin-right: auto;
+        padding: 0 10px;
+        font-weight: bold;
+    }
 
-.user-profile__twoots-wrapper {
-    display: grid;
-    grid-gap: 10px;
-}
+    .user-profile__twoots-wrapper {
+        display: grid;
+        grid-gap: 10px;
+    }
 
-.user-profile__create-twoot {
-    padding-top: 20px;
-    display: flex;
-    flex-direction: column;
+    .user-profile__create-twoot {
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+
+        &.--exeeded {
+            color: red;
+            border-color: red;
+
+            button {
+                background-color: grey;
+                color: white;
+                border: none;
+            }
+        }
+
+
+        textarea {
+            margin-bottom: 10px;
+            width: 100%;
+            height: 150px;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            resize: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            margin-bottom: 20px;
+        }
+    }
 }
 
 h1 {
