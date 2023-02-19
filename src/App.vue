@@ -8,7 +8,12 @@
       </router-link>
 
       <div class="navigation__username">
-        @_{{ user.username }}
+      <template v-if="user">
+        @_{{ user.username  }}
+      </template>
+      <template v-else>
+        Guest user
+      </template>
       </div>
     </nav>
     <router-view />
@@ -16,14 +21,17 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'App',
-  data() {
+  setup () {
+    const store = useStore()
+    const user = computed(() => store.state.User.user)
+  
     return {
-      user: {
-        username: "ahmedBesbes"
-      }
+      user
     }
   }
 }
