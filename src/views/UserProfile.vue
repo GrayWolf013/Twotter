@@ -2,6 +2,7 @@
     <div class="user-profile">
         <div class="user-profile__user-panel">
             <h1 class="user-profile__user-name"> @_{{ user.username }}</h1>
+            <h2>{{ userId }}</h2>
             <div class="user-profile__admin-badge" v-if="user.isAdmin">
                 Admin
             </div>
@@ -19,29 +20,23 @@
 </template>
 
 <script>
-import TwotterItem from './TwotterItem.vue'
-import CreateTwootPannel from './CreateTwootPannel.vue'
+import TwotterItem from '../components/TwotterItem.vue'
+import CreateTwootPannel from '../components/CreateTwootPannel.vue'
 
-import { reactive, toRefs, onMounted } from 'vue'
+import { users } from '@/assets/users'
+
+import { reactive, toRefs, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default {
     name: 'UserProfile',
     setup() {
+        const route = useRoute()
+        const userId = computed(() => route.params.userId)
+
         const state = reactive({
             followers: 0,
-            user: {
-                id: 1,
-                username: "ahmedbe",
-                firstName: "Ahmed",
-                lastName: "Besbes",
-                email: "besbes1995@gmail.com",
-                isAdmin: true,
-                twoots: [
-                    { id: 1, content: "Twotter is AMAZING !! :D" },
-                    { id: 2, content: "I am a fan of Star Wars" },
-                    { id: 3, content: "Fight Club is an amazing movie" },
-                ],
-            },
+            user: users[userId.value - 1] || users[0],
         })
 
         function followUser() {
@@ -65,6 +60,8 @@ export default {
 
         return {
             ...toRefs(state),
+        
+            userId,
 
             followUser,
             toggleFavorite,
